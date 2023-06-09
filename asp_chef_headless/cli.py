@@ -8,7 +8,7 @@ from dumbo_utils.validation import validate
 from playwright.sync_api import sync_playwright, Playwright
 
 
-class Browser(Enum):
+class Browser(str, Enum):
     CHROMIUM = "chromium"
     # CHROME = "chrome"
     # CHROME_BETA = "chrome-beta"
