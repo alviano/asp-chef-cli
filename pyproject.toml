@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "asp-chef-headless"
+version = "0.1.0"
+description = ""
+authors = ["Mario Alviano <mario.alviano@gmail.com>"]
+readme = "README.md"
+packages = [{include = "asp_chef_headless"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest-playwright = "^0.3.3"
+rich = "^13.4.1"
+typer = "^0.9.0"
+dumbo-utils = "^0.1.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
