@@ -1,6 +1,6 @@
-# ASP Chef Headless
+# ASP Chef CLI
 
-A simple CLI to run ASP Chef in headless mode.
+A simple CLI to run ASP Chef, in headed or headless mode.
 
 
 ## Install
