@@ -5,7 +5,7 @@ import typer
 from dumbo_utils.console import console
 from dumbo_utils.url import compress_object_for_url
 from dumbo_utils.validation import validate
-from playwright.sync_api import sync_playwright, Playwright
+from playwright.sync_api import sync_playwright, Playwright, Error
 
 
 class Browser(str, Enum):
@@ -31,6 +31,7 @@ class Browser(str, Enum):
 @dataclasses.dataclass(frozen=True)
 class AppOptions:
     recipe_url: str = dataclasses.field(default="")
+    headless: bool = dataclasses.field(default=False)
     browser: Browser = dataclasses.field(default=Browser.FIREFOX)
     debug: bool = dataclasses.field(default=False)
 
@@ -63,11 +64,17 @@ def version_callback(value: bool):
 
 def fetch(url: str):
     with sync_playwright() as playwright:
-        browser = app_options.browser.get(playwright).launch(headless=not app_options.debug)
+        browser = app_options.browser.get(playwright).launch(headless=app_options.headless and not app_options.debug)
         context = browser.new_context()
         page = context.new_page()
         page.goto(url)
-        result = page.get_by_test_id("Headless-output").text_content()
+        if app_options.headless:
+            result = page.get_by_test_id("Headless-output").text_content()
+        else:
+            try:
+                page.get_by_test_id("Headless-output").text_content(timeout=60 * 60 * 24)
+            except Error:
+                result = "All done!"
         if not app_options.debug:
             browser.close()
     return result
@@ -76,22 +83,26 @@ def fetch(url: str):
 @app.callback()
 def main(
         recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL (headless mode)"),
+        headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
         browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
         debug: bool = typer.Option(False, "--debug", help="Don't minimize browser"),
         version: bool = typer.Option(False, "--version", callback=version_callback, is_eager=True,
                                      help="Print version and exit"),
 ):
     """
-    A simple CLI to run ASP Chef headless mode!
+    A simple CLI to run ASP Chef
     """
     global app_options
 
-    if "/headless#" not in recipe_url:
-        recipe_url = recipe_url.replace("/#", "/headless#", 1)
-    validate("headless mode", recipe_url, contains="/headless#", help_msg="Invalid URL. Not a sharable ASP Chef URL.")
+    if headless:
+        if "/headless#" not in recipe_url:
+            recipe_url = recipe_url.replace("/#", "/headless#", 1)
+        validate("headless mode", recipe_url, contains="/headless#",
+                 help_msg="Invalid URL. Not a sharable ASP Chef URL.")
 
     app_options = AppOptions(
         recipe_url=recipe_url,
+        headless=headless,
         browser=browser,
         debug=debug,
     )
@@ -116,10 +127,13 @@ def command_run_with(
     Run a recipe with the input specified from STDIN or via the --input option.
     """
     url = app_options.recipe_url
+    if not app_options.headless:
+        url = url.replace("/#", "/open#", 1)
     url = url.replace(r"#.*;", "#", 1)
     url = url.replace("#", "#" + compress_object_for_url({"input": the_input}, suffix="") + ";", 1)
 
     with console.status("Processing..."):
         result = fetch(url)
 
+    console.print()
     console.print(result)

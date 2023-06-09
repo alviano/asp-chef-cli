@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from asp_chef_headless.cli import run_app
+from asp_chef_cli.cli import run_app
 
 if __name__ == "__main__":
     run_app()
