@@ -11,9 +11,10 @@ $ pip install asp-chef-cli
 $ playwright install
 ```
 
-Docker is another option (for headless mode):
+Docker is another option (headed mode needs extra parameters):
 ```bash
-$ docker run malvi/asp-chef-headless
+$ docker run malvi/asp-chef-cli
+$ docker run docker run --net=host --env="DISPLAY" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" malvi/asp-chef-cli
 ```
 
 
@@ -23,8 +24,8 @@ $ docker run malvi/asp-chef-headless
 
 Run with one of the following commands:
 ```bash
-$ docker run malvi/asp-chef-headless --help
 $ python -m asp_chef_cli --help
+$ docker run malvi/asp-chef-cli --help
 ```
 
 Add the recipe (an ASP Chef sharable URL) with the option `--url` (quote the URL as it contains characters like # that breaks bash and other terminals).
