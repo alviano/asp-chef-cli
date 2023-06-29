@@ -1,4 +1,5 @@
 import dataclasses
+import fileinput
 from enum import Enum
 
 import typer
@@ -57,7 +58,7 @@ def run_app():
 def version_callback(value: bool):
     if value:
         import importlib.metadata
-        __version__ = importlib.metadata.version("dumbo-esse3")
+        __version__ = importlib.metadata.version("asp-chef-cli")
         console.print("asp-chef-headless", __version__)
         raise typer.Exit()
 
@@ -121,11 +122,16 @@ def command_run() -> None:
 
 @app.command(name="run-with")
 def command_run_with(
-        the_input: str = typer.Option(..., "--input", "-i", prompt=True, help="A custom input for the recipe"),
+        the_input: str = typer.Option("--", "--input", "-i",
+                                      help="A custom input for the recipe (read from STDIN by default; "
+                                           "use CTRL+D to close the input)"),
 ) -> None:
     """
     Run a recipe with the input specified from STDIN or via the --input option.
     """
+    if the_input == "--":
+        the_input = ''.join(line for line in fileinput.input("-"))
+
     url = app_options.recipe_url
     if not app_options.headless:
         url = url.replace("/#", "/open#", 1)
@@ -135,5 +141,4 @@ def command_run_with(
     with console.status("Processing..."):
         result = fetch(url)
 
-    console.print()
     console.print(result)
