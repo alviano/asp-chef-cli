@@ -59,7 +59,7 @@ def version_callback(value: bool):
     if value:
         import importlib.metadata
         __version__ = importlib.metadata.version("asp-chef-cli")
-        console.print("asp-chef-headless", __version__)
+        console.print("asp-chef-cli", __version__)
         raise typer.Exit()
 
 
@@ -83,7 +83,7 @@ def fetch(url: str):
 
 @app.callback()
 def main(
-        recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL (headless mode)"),
+        recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL"),
         headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
         browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
         debug: bool = typer.Option(False, "--debug", help="Don't minimize browser"),

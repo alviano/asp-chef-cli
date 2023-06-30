@@ -116,11 +116,11 @@ python-versions = "*"
 
 [[package]]
 name = "markdown-it-py"
-version = "2.2.0"
+version = "3.0.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 
 [package.dependencies]
 mdurl = ">=0.1,<1.0"
@@ -132,7 +132,7 @@ compare = ["commonmark (>=0.9,<1.0)", "markdown (>=3.4,<4.0)", "mistletoe (>=1.0
 linkify = ["linkify-it-py (>=1,<3)"]
 plugins = ["mdit-py-plugins"]
 profiling = ["gprof2dot"]
-rtd = ["attrs", "myst-parser", "pyyaml", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinx_book_theme"]
+rtd = ["jupyter_sphinx", "mdit-py-plugins", "myst-parser", "pyyaml", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinx_book_theme"]
 testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
 
 [[package]]
@@ -153,7 +153,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "playwright"
-version = "1.34.0"
+version = "1.35.0"
 description = "A high-level API to automate web browsers"
 category = "main"
 optional = false
@@ -165,11 +165,11 @@ pyee = "9.0.4"
 
 [[package]]
 name = "pluggy"
-version = "1.0.0"
+version = "1.2.0"
 description = "plugin and hook calling mechanisms for python"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.extras]
 dev = ["pre-commit", "tox"]
@@ -199,7 +199,7 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pytest"
-version = "7.3.1"
+version = "7.4.0"
 description = "pytest: simple powerful testing with Python"
 category = "main"
 optional = false
@@ -214,7 +214,7 @@ pluggy = ">=0.12,<2.0"
 tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
-testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
+testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
 name = "pytest-base-url"
@@ -276,14 +276,14 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "rich"
-version = "13.4.1"
+version = "13.4.2"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 
 [package.dependencies]
-markdown-it-py = ">=2.2.0,<3.0.0"
+markdown-it-py = ">=2.2.0"
 pygments = ">=2.13.0,<3.0.0"
 
 [package.extras]
@@ -348,7 +348,7 @@ test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.
 
 [[package]]
 name = "typing-extensions"
-version = "4.6.3"
+version = "4.7.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
 category = "main"
 optional = false
@@ -384,7 +384,7 @@ six = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "f3162c34bf3a71411c9e578bddb26c41321f07e9f7c8ba64014e4729f0477374"
+content-hash = "4c1f9d1f0895e067733c2ccef1077618e23b613d297c1e4d9bfdb14b42e8c237"
 
 [metadata.files]
 certifi = [
@@ -567,8 +567,8 @@ makefun = [
     {file = "makefun-1.15.1.tar.gz", hash = "sha256:40b0f118b6ded0d8d78c78f1eb679b8b6b2462e3c1b3e05fb1b2da8cd46b48a5"},
 ]
 markdown-it-py = [
-    {file = "markdown-it-py-2.2.0.tar.gz", hash = "sha256:7c9a5e412688bc771c67432cbfebcdd686c93ce6484913dccf06cb5a0bea35a1"},
-    {file = "markdown_it_py-2.2.0-py3-none-any.whl", hash = "sha256:5a35f8d1870171d9acc47b99612dc146129b631baf04970128b568f190d0cc30"},
+    {file = "markdown-it-py-3.0.0.tar.gz", hash = "sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb"},
+    {file = "markdown_it_py-3.0.0-py3-none-any.whl", hash = "sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1"},
 ]
 mdurl = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
@@ -579,17 +579,17 @@ packaging = [
     {file = "packaging-23.1.tar.gz", hash = "sha256:a392980d2b6cffa644431898be54b0045151319d1e7ec34f0cfed48767dd334f"},
 ]
 playwright = [
-    {file = "playwright-1.34.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:69bb9b3296e366a23a99277b4c7673cb54ce71a3f5d630f114f7701b61f98f25"},
-    {file = "playwright-1.34.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:402d946631c8458436e099d7731bbf54cf79c9e62e3acae0ea8421e72616926b"},
-    {file = "playwright-1.34.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:462251cda0fcbb273497d357dbe14b11e43ebceb0bac9b892beda041ff209aa9"},
-    {file = "playwright-1.34.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:a8ba124ea302596a03a66993cd500484fb255cbc10fe0757fa4d49f974267a80"},
-    {file = "playwright-1.34.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bf0cb6aac49d24335fe361868aea72b11f276a95e7809f1a5d1c69b4120c46ac"},
-    {file = "playwright-1.34.0-py3-none-win32.whl", hash = "sha256:c50fef189d87243cc09ae0feb8e417fbe434359ccbcc863fb19ba06d46d31c33"},
-    {file = "playwright-1.34.0-py3-none-win_amd64.whl", hash = "sha256:42e16c930e1e910461f4c551a72fc1b900f37124431bf2b6a6d9ddae70042db4"},
+    {file = "playwright-1.35.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:9eb7fdb7bb3f4e528e63641b83827531739c58a40c71d4ea0030321d3f04a742"},
+    {file = "playwright-1.35.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:444446b55bfb33ac62398f9f71a8fdb6cee1ceda3316d95db3c6419c51bca9be"},
+    {file = "playwright-1.35.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:4f486ea09940a35c08ec26f272bdcb6c1e043d400f3b9b924d541c5f4a7ed8f3"},
+    {file = "playwright-1.35.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:a29cd048b3eddaf116b154328bcb8e3f3a637753cbb926ae3ef5a5e694ed2d64"},
+    {file = "playwright-1.35.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bc1d0686bdb6d7c2ce75087a1d6c7820e3de65be893f8a5ec64455613e884b39"},
+    {file = "playwright-1.35.0-py3-none-win32.whl", hash = "sha256:188481e780166eae9a2215bb3a58043ae167f7cc963282c7b7d14ba53858451c"},
+    {file = "playwright-1.35.0-py3-none-win_amd64.whl", hash = "sha256:2df7cfaaca881fd065f68e1c72a8216679a5b096f2add60c8c7c9dc909fdf7ef"},
 ]
 pluggy = [
-    {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
-    {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
+    {file = "pluggy-1.2.0-py3-none-any.whl", hash = "sha256:c2fd55a7d7a3863cba1a013e4e2414658b1d07b6bc57b3919e0c63c9abb99849"},
+    {file = "pluggy-1.2.0.tar.gz", hash = "sha256:d12f0c4b579b15f5e054301bb226ee85eeeba08ffec228092f8defbaa3a4c4b3"},
 ]
 pyee = [
     {file = "pyee-9.0.4-py2.py3-none-any.whl", hash = "sha256:9f066570130c554e9cc12de5a9d86f57c7ee47fece163bbdaa3e9c933cfbdfa5"},
@@ -600,8 +600,8 @@ pygments = [
     {file = "Pygments-2.15.1.tar.gz", hash = "sha256:8ace4d3c1dd481894b2005f560ead0f9f19ee64fe983366be1a21e171d12775c"},
 ]
 pytest = [
-    {file = "pytest-7.3.1-py3-none-any.whl", hash = "sha256:3799fa815351fea3a5e96ac7e503a96fa51cc9942c3753cda7651b93c1cfa362"},
-    {file = "pytest-7.3.1.tar.gz", hash = "sha256:434afafd78b1d78ed0addf160ad2b77a30d35d4bdf8af234fe621919d9ed15e3"},
+    {file = "pytest-7.4.0-py3-none-any.whl", hash = "sha256:78bf16451a2eb8c7a2ea98e32dc119fd2aa758f1d5d66dbf0a59d69a3969df32"},
+    {file = "pytest-7.4.0.tar.gz", hash = "sha256:b4bf8c45bd59934ed84001ad51e11b4ee40d40a1229d2c79f9c592b0a3f6bd8a"},
 ]
 pytest-base-url = [
     {file = "pytest-base-url-2.0.0.tar.gz", hash = "sha256:e1e88a4fd221941572ccdcf3bf6c051392d2f8b6cef3e0bc7da95abec4b5346e"},
@@ -620,8 +620,8 @@ requests = [
     {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
 ]
 rich = [
-    {file = "rich-13.4.1-py3-none-any.whl", hash = "sha256:d204aadb50b936bf6b1a695385429d192bc1fdaf3e8b907e8e26f4c4e4b5bf75"},
-    {file = "rich-13.4.1.tar.gz", hash = "sha256:76f6b65ea7e5c5d924ba80e322231d7cb5b5981aa60bfc1e694f1bc097fe6fe1"},
+    {file = "rich-13.4.2-py3-none-any.whl", hash = "sha256:8f87bc7ee54675732fa66a05ebfe489e27264caeeff3728c945d25971b6485ec"},
+    {file = "rich-13.4.2.tar.gz", hash = "sha256:d653d6bccede5844304c605d5aac802c7cf9621efd700b46c7ec2b51ea914898"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
@@ -644,8 +644,8 @@ typer = [
     {file = "typer-0.9.0.tar.gz", hash = "sha256:50922fd79aea2f4751a8e0408ff10d2662bd0c8bbfa84755a699f3bada2978b2"},
 ]
 typing-extensions = [
-    {file = "typing_extensions-4.6.3-py3-none-any.whl", hash = "sha256:88a4153d8505aabbb4e13aacb7c486c2b4a33ca3b3f807914a9b4c844c471c26"},
-    {file = "typing_extensions-4.6.3.tar.gz", hash = "sha256:d91d5919357fe7f681a9f2b5b4cb2a5f1ef0a1e9f59c4d8ff0d3491e05c0ffd5"},
+    {file = "typing_extensions-4.7.0-py3-none-any.whl", hash = "sha256:5d8c9dac95c27d20df12fb1d97b9793ab8b2af8a3a525e68c80e21060c161771"},
+    {file = "typing_extensions-4.7.0.tar.gz", hash = "sha256:935ccf31549830cda708b42289d44b6f74084d616a00be651601a4f968e77c82"},
 ]
 urllib3 = [
     {file = "urllib3-2.0.3-py3-none-any.whl", hash = "sha256:48e7fafa40319d358848e1bc6809b208340fafe2096f1725d05d67443d0483d1"},
