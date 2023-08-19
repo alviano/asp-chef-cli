@@ -73,7 +73,7 @@ def fetch(url: str):
             result = page.get_by_test_id("Headless-output").text_content()
         else:
             try:
-                page.get_by_test_id("Headless-output").text_content(timeout=60 * 60 * 24)
+                page.get_by_test_id("Headless-output").text_content(timeout=1000 * 60 * 60 * 24)
             except Error:
                 result = "All done!"
         if not app_options.debug:
