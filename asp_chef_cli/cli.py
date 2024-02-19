@@ -1,8 +1,10 @@
 import dataclasses
 import fileinput
 from enum import Enum
+from typing import Optional
 
 import typer
+import uvicorn
 from dumbo_utils.console import console
 from dumbo_utils.url import compress_object_for_url
 from dumbo_utils.validation import validate
@@ -81,11 +83,23 @@ def fetch(url: str):
     return result
 
 
+def process_url(recipe_url: str, headless: bool, the_input: Optional[str] = None) -> str:
+    if headless:
+        if "/headless#" not in recipe_url:
+            recipe_url = recipe_url.replace("/#", "/headless#", 1)
+        validate("headless mode", recipe_url, contains="/headless#",
+                 help_msg="Invalid URL. Not a sharable ASP Chef URL.")
+    if the_input is not None:
+        if not headless:
+            recipe_url = recipe_url.replace("/#", "/open#", 1)
+        recipe_url = recipe_url.replace(r"#.*;", "#", 1)
+        recipe_url = recipe_url.replace("#", "#" + compress_object_for_url({"input": the_input}, suffix="") + ";", 1)
+
+    return recipe_url
+
+
 @app.callback()
 def main(
-        recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL"),
-        headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
-        browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
         debug: bool = typer.Option(False, "--debug", help="Don't minimize browser"),
         version: bool = typer.Option(False, "--version", callback=version_callback, is_eager=True,
                                      help="Print version and exit"),
@@ -95,33 +109,33 @@ def main(
     """
     global app_options
 
-    if headless:
-        if "/headless#" not in recipe_url:
-            recipe_url = recipe_url.replace("/#", "/headless#", 1)
-        validate("headless mode", recipe_url, contains="/headless#",
-                 help_msg="Invalid URL. Not a sharable ASP Chef URL.")
-
     app_options = AppOptions(
-        recipe_url=recipe_url,
-        headless=headless,
-        browser=browser,
         debug=debug,
     )
 
 
 @app.command(name="run")
-def command_run() -> None:
+def command_run(
+        recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL"),
+        headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
+        browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
+) -> None:
     """
     Run a recipe.
     """
+    recipe_url = process_url(recipe_url, headless)
+
     with console.status("Processing..."):
-        result = fetch(app_options.recipe_url)
+        result = fetch(recipe_url)
 
     console.print(result)
 
 
 @app.command(name="run-with")
 def command_run_with(
+        recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL"),
+        headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
+        browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
         the_input: str = typer.Option("--", "--input", "-i",
                                       help="A custom input for the recipe (read from STDIN by default; "
                                            "use CTRL+D to close the input)"),
@@ -131,14 +145,20 @@ def command_run_with(
     """
     if the_input == "--":
         the_input = ''.join(line for line in fileinput.input("-"))
-
-    url = app_options.recipe_url
-    if not app_options.headless:
-        url = url.replace("/#", "/open#", 1)
-    url = url.replace(r"#.*;", "#", 1)
-    url = url.replace("#", "#" + compress_object_for_url({"input": the_input}, suffix="") + ";", 1)
+    recipe_url = process_url(recipe_url, headless, the_input)
 
     with console.status("Processing..."):
-        result = fetch(url)
+        result = fetch(recipe_url)
 
     console.print(result)
+
+
+@app.command(name="start-dumbo-server")
+def command_run_with(
+        port: int = typer.Option(8000, "--port", "-p",
+                                 help="An available port to listen for incoming requests"),
+) -> None:
+    """
+    Run a server for @dumbo/* operations.
+    """
+    uvicorn.run("asp_chef_cli.dumbo_server:app", port=port)
