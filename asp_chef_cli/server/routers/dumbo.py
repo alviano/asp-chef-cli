@@ -64,13 +64,13 @@ async def _(json):
     }
 
 
-@endpoint(router, "/move-up/")
+@endpoint(router, "/move-before/")
 async def _(json):
     program = SymbolicProgram.parse(json["program"])
     atoms = atoms_from_facts(SymbolicProgram.parse(json["atoms"]), ground=False)
 
     return {
-        "program": str(program.move_up(*atoms))
+        "program": str(program.move_before(*atoms))
     }
 
 
