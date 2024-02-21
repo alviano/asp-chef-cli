@@ -1,19 +1,18 @@
 [tool.poetry]
 name = "asp-chef-cli"
-version = "0.2.0"
+version = "0.2.1"
 description = "A simple CLI to run ASP Chef recipes"
 authors = ["Mario Alviano <mario.alviano@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pytest-playwright = "^0.3.3"
+pytest-playwright = "^0.4.4"
 rich = "^13.4.2"
 typer = "^0.9.0"
-dumbo-utils = "^0.1.9"
 dumbo-asp = "^0.2.6"
-uvicorn = "^0.23.2"
-fastapi = "^0.103.0"
+uvicorn = "^0.27.1"
+fastapi = "^0.109.2"
 
 
 [build-system]

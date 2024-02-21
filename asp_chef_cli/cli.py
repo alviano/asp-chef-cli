@@ -153,12 +153,14 @@ def command_run_with(
     console.print(result)
 
 
-@app.command(name="start-dumbo-server")
+@app.command(name="server")
 def command_run_with(
         port: int = typer.Option(8000, "--port", "-p",
                                  help="An available port to listen for incoming requests"),
+        reload: bool = typer.Option(False, "--reload",
+                                    help="Reload server if source code changes (for development)")
 ) -> None:
     """
     Run a server for @dumbo/* operations.
     """
-    uvicorn.run("asp_chef_cli.dumbo_server:app", port=port)
+    uvicorn.run("asp_chef_cli.server.main:app", port=port, reload=reload)
