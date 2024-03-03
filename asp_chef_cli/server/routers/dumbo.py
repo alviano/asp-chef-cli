@@ -80,6 +80,7 @@ async def _(json):
     answer_set = Model.of_atoms(atom for atom in json["answer_set"])
     herbrand_base = atoms_from_facts(SymbolicProgram.parse(json["herbrand_base"]))
     query = Model.of_atoms(atom for atom in json["query"])
+    as_forest = json["as_forest"]
 
     validate("program", program, min_len=1, help_msg="Program cannot be empty")
     validate("herbrand base", herbrand_base, min_len=1, help_msg="Herbrand base cannot be empty")
@@ -93,6 +94,7 @@ async def _(json):
     )
     url = pack_xasp_navigator_url(
         graph,
+        as_forest_with_roots=query if as_forest else None,
         with_chopped_body=True,
         with_backward_search=True,
         backward_search_symbols=(';', ' :-'),
