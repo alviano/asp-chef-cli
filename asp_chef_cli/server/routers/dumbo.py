@@ -47,7 +47,7 @@ async def _(json):
     program = SymbolicProgram.parse(json["program"])
     herbrand_base = None
     if json["herbrand_base"]:
-        herbrand_base = Model.of_atoms(atoms_from_facts(SymbolicProgram.parse(json["herbrand_base"])))
+        herbrand_base = Model.of_atoms(atoms_from_facts(SymbolicProgram.parse(json["herbrand_base"])), sort=False)
     expand = {SymbolicRule.parse(key): value for key, value in json["expand"].items()}
 
     return {
@@ -77,9 +77,9 @@ async def _(json):
 @endpoint(router, "/explanation-graph/")
 async def _(json):
     program = SymbolicProgram.parse(json["program"])
-    answer_set = Model.of_atoms(atom for atom in json["answer_set"])
+    answer_set = Model.of_atoms(*(atom for atom in json["answer_set"]), sort=False)
     herbrand_base = atoms_from_facts(SymbolicProgram.parse(json["herbrand_base"]))
-    query = Model.of_atoms(atom for atom in json["query"])
+    query = Model.of_atoms(*(atom for atom in json["query"]), sort=False)
     as_forest = json["as_forest"]
 
     validate("program", program, min_len=1, help_msg="Program cannot be empty")
