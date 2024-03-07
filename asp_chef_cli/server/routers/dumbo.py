@@ -23,7 +23,7 @@ async def _(json):
     program = SymbolicProgram.parse(json["program"])
 
     return {
-        "herbrand_base": program.herbrand_base_without_false_predicate.as_facts
+        "herbrand_base": program.herbrand_base.as_facts
     }
 
 
