@@ -83,14 +83,14 @@ def fetch(url: str):
     return result
 
 
-def process_url(recipe_url: str, headless: bool, the_input: Optional[str] = None) -> str:
-    if headless:
+def process_url(recipe_url: str, the_input: Optional[str] = None) -> str:
+    if app_options.headless:
         if "/headless#" not in recipe_url:
             recipe_url = recipe_url.replace("/#", "/headless#", 1)
         validate("headless mode", recipe_url, contains="/headless#",
                  help_msg="Invalid URL. Not a sharable ASP Chef URL.")
     if the_input is not None:
-        if not headless:
+        if not app_options.headless:
             recipe_url = recipe_url.replace("/#", "/open#", 1)
         recipe_url = recipe_url.replace(r"#.*;", "#", 1)
         recipe_url = recipe_url.replace("#", "#" + compress_object_for_url({"input": the_input}, suffix="") + ";", 1)
@@ -101,6 +101,8 @@ def process_url(recipe_url: str, headless: bool, the_input: Optional[str] = None
 @app.callback()
 def main(
         debug: bool = typer.Option(False, "--debug", help="Don't minimize browser"),
+        headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
+        browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
         version: bool = typer.Option(False, "--version", callback=version_callback, is_eager=True,
                                      help="Print version and exit"),
 ):
@@ -111,19 +113,19 @@ def main(
 
     app_options = AppOptions(
         debug=debug,
+        headless=headless,
+        browser=browser,
     )
 
 
 @app.command(name="run")
 def command_run(
         recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL"),
-        headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
-        browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
 ) -> None:
     """
     Run a recipe.
     """
-    recipe_url = process_url(recipe_url, headless)
+    recipe_url = process_url(recipe_url)
 
     with console.status("Processing..."):
         result = fetch(recipe_url)
@@ -134,8 +136,6 @@ def command_run(
 @app.command(name="run-with")
 def command_run_with(
         recipe_url: str = typer.Option(..., "--url", "-u", help="A sharable ASP Chef URL"),
-        headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
-        browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
         the_input: str = typer.Option("--", "--input", "-i",
                                       help="A custom input for the recipe (read from STDIN by default; "
                                            "use CTRL+D to close the input)"),
@@ -145,7 +145,7 @@ def command_run_with(
     """
     if the_input == "--":
         the_input = ''.join(line for line in fileinput.input("-"))
-    recipe_url = process_url(recipe_url, headless, the_input)
+    recipe_url = process_url(recipe_url, the_input)
 
     with console.status("Processing..."):
         result = fetch(recipe_url)
