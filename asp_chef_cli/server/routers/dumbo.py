@@ -81,16 +81,19 @@ async def _(json):
     herbrand_base = atoms_from_facts(SymbolicProgram.parse(json["herbrand_base"]))
     query = Model.of_atoms(*(atom for atom in json["query"]), sort=False)
     as_forest = json["as_forest"]
+    collect_pus_program = json["collect_pus_program"]
 
     validate("program", program, min_len=1, help_msg="Program cannot be empty")
     validate("herbrand base", herbrand_base, min_len=1, help_msg="Herbrand base cannot be empty")
     validate("query", query, min_len=1, help_msg="Query cannot be empty")
 
+    pus_program = []
     graph = explanation_graph(
         program=program,
         answer_set=answer_set,
         herbrand_base=herbrand_base,
         query=query,
+        collect_pus_program=pus_program if collect_pus_program else None
     )
     url = pack_xasp_navigator_url(
         graph,
@@ -101,4 +104,5 @@ async def _(json):
     )
     return {
         "url": url,
+        "pus_program": [str(program) for program in pus_program],
     }
