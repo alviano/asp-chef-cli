@@ -36,11 +36,19 @@ class AppOptions:
     recipe_url: str = dataclasses.field(default="")
     headless: bool = dataclasses.field(default=False)
     browser: Browser = dataclasses.field(default=Browser.FIREFOX)
+    fast_print: bool = dataclasses.field(default=False)
     debug: bool = dataclasses.field(default=False)
 
 
 app_options = AppOptions()
 app = typer.Typer()
+
+
+def _print(*args, **kwargs):
+    if app_options.fast_print:
+        print(*args, **kwargs)
+    else:
+        console.print(*args, **kwargs)
 
 
 def is_debug_on():
@@ -103,6 +111,8 @@ def main(
         debug: bool = typer.Option(False, "--debug", help="Don't minimize browser"),
         headless: bool = typer.Option(False, help="Run ASP Chef in headless mode"),
         browser: Browser = typer.Option(Browser.FIREFOX, "--browser", help="Use a specific browser"),
+        fast_print: bool = typer.Option(False, "--fast-print", "-f", 
+                                        help="Print faster, without colors"),
         version: bool = typer.Option(False, "--version", callback=version_callback, is_eager=True,
                                      help="Print version and exit"),
 ):
@@ -115,6 +125,7 @@ def main(
         debug=debug,
         headless=headless,
         browser=browser,
+        fast_print=fast_print,
     )
 
 
@@ -130,7 +141,7 @@ def command_run(
     with console.status("Processing..."):
         result = fetch(recipe_url)
 
-    console.print(result)
+    _print(result)
 
 
 @app.command(name="run-with")
@@ -150,7 +161,7 @@ def command_run_with(
     with console.status("Processing..."):
         result = fetch(recipe_url)
 
-    console.print(result)
+    _print(result)
 
 
 @app.command(name="server")
