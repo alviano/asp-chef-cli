@@ -1,3 +1,5 @@
+import subprocess
+
 from dumbo_asp.primitives.models import Model
 from dumbo_asp.primitives.rules import SymbolicRule
 from dumbo_asp.queries import explanation_graph, pack_xasp_navigator_url
@@ -105,4 +107,17 @@ async def _(json):
     return {
         "url": url,
         "pus_program": [str(program) for program in pus_program],
+    }
+
+
+@endpoint(router, "/sdl")
+async def _(json):
+    program = json["program"]
+    result = subprocess.check_output(
+        ["./run.sh"],
+        input=program.encode(),
+        cwd="../SDL",
+    )
+    return {
+        "program": result,
     }
