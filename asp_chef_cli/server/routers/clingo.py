@@ -33,7 +33,7 @@ async def _(json):
     clingo_terminate(uuid)
 
     cmd = f"bwrap --ro-bind /usr/lib /usr/lib --ro-bind /lib /lib --ro-bind /lib64 /lib64 " \
-          f"--ro-bind /home/malvi/soft/miniconda3/lib /usr/lib --ro-bind /bin/timeout /bin/timeout".split(' ') +\
+          f"--ro-bind /bin/timeout /bin/timeout".split(' ') +\
           ["--ro-bind", clingo_path, "/bin/clingo"] +\
           ["/bin/timeout", str(timeout), "/bin/clingo", "--outf=2", *options, str(number)]
     clingo_process[uuid] = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

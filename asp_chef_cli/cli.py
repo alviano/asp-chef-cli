@@ -165,7 +165,7 @@ def command_run_with(
 
 
 @app.command(name="server")
-def command_run_with(
+def command_server(
         port: int = typer.Option(8000, "--port", "-p",
                                  help="An available port to listen for incoming requests"),
         reload: bool = typer.Option(False, "--reload",
