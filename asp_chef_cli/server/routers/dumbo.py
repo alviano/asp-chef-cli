@@ -135,3 +135,12 @@ async def _(json):
         "predicates": sorted([f"{predicate.name}/{predicate.arity}" for predicate in template.predicates()]),
         "program": str(template.program),
     }
+
+
+@endpoint(router, "/template/expand-program/")
+async def _(json):
+    program = json["program"]
+    result = Template.expand_program(SymbolicProgram.parse(program))
+    return {
+        "program": str(result),
+    }
