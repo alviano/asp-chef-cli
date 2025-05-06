@@ -110,7 +110,7 @@ async def _(json):
     }
 
 
-@endpoint(router, "/sdl")
+@endpoint(router, "/sdl/")
 async def _(json):
     program = json["program"]
     result = subprocess.check_output(
@@ -123,8 +123,15 @@ async def _(json):
     }
 
 
-@endpoint(router, "/template/core-template-names")
+@endpoint(router, "/template/core-template/")
 async def _(json):
+    if not json:
+        return sorted(Template.core_template_names())
+    name = json["name"]
+    template = Template.core_template(name)
     return {
-        "names": Template.core_template_names(),
+        "name": name,
+        "documentation": template.documentation,
+        "predicates": sorted([f"{predicate.name}/{predicate.arity}" for predicate in template.predicates()]),
+        "program": str(template.program),
     }
