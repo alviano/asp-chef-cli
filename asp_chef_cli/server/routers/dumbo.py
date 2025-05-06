@@ -28,6 +28,17 @@ async def _(json):
         "herbrand_base": program.herbrand_base.as_facts
     }
 
+@endpoint(router, "/test-paola/")
+async def _(json):
+    test = "ciao(1)."
+    print("test ")
+    print(json["program"])
+    # program1 = SymbolicProgram.test(test)
+    program2 = SymbolicAtom.test2(json["program"])
+    return {
+        "test_paola": program2
+    }
+
 
 @endpoint(router, "/global-safe-variables/")
 async def _(json):
