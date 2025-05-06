@@ -31,9 +31,9 @@ Add the recipe (an ASP Chef sharable URL) with the option `--url` (quote the URL
 The headless mode can be activated with the flag `--headless` (always active in the docker image).
 Possibly change the default browser used by playwright with the option `--browser`.
 Finally, give a command to execute:
-
 - `run` simply runs the recipe as it is;
 - `run-with` runs the recipe with the input replaced by the one specified either with the option `--input` or via the prompt.
+- `server` starts a server for `@dumbo/*` operations.
 
 The flag `--help` can be specified after a command to get a list of arguments for that command.
 
@@ -59,32 +59,11 @@ hello.
 world.
 ```
 
-### Avvio Server Locale
 
-Di default serve sulla porta `8000` e asp-chef in locale e' configurato pure lui per fare le chiamate sulla porta `8000`, se devi modificare questo valore assicurati di cambiarlo anche in asp-chef nel file `src/lib/stores.ts`
+## Local Server for @dumbo/* Operations
 
-```ts
-export const server_url = writable(
-  (browser ? localStorage.getItem("server-url") : "") || "http://localhost:8000"
-);
-```
+The server for `@dumbo/*` operations can be executed with the command `server`.
+By default, it uses port `8000` (a different port can be specified using `--port` or `-p`; in this case, the port must be changed also in the options of ASP Chef).
 
-```bash
-$ poetry update
-$ poetry shell
+For development, add the `--reload` flag so that the server is updated when the Python code of the CLI is changed. 
 
-# Se non funziona aggingere il plugin
-$ poetry self add poetry-plugin-shell
-$ yay -S python-poetry-plugin-shell
-$ poetry shell
-
-$ python -m asp_chef_cli server --reload
-
-```
-
-
-
-endpoint chiamata alla lsita di dumbo asp
-get documentazione dei template
-chiedere la lista dei predicati
-exact_copy atomo debug mostrare 

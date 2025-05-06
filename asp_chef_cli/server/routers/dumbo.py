@@ -2,6 +2,7 @@ import subprocess
 
 from dumbo_asp.primitives.models import Model
 from dumbo_asp.primitives.rules import SymbolicRule
+from dumbo_asp.primitives.templates import Template
 from dumbo_asp.queries import explanation_graph, pack_xasp_navigator_url
 from fastapi import APIRouter
 
@@ -27,18 +28,6 @@ async def _(json):
     return {
         "herbrand_base": program.herbrand_base.as_facts
     }
-
-@endpoint(router, "/test-paola/")
-async def _(json):
-    test = "ciao(1)."
-    print("test ")
-    print(json["program"])
-    # program1 = SymbolicProgram.test(test)
-    program2 = SymbolicAtom.test2(json["program"])
-    return {
-        "test_paola": program2
-    }
-
 
 @endpoint(router, "/global-safe-variables/")
 async def _(json):
@@ -131,4 +120,11 @@ async def _(json):
     )
     return {
         "program": result,
+    }
+
+
+@endpoint(router, "/template/core-template-names")
+async def _(json):
+    return {
+        "names": Template.core_template_names(),
     }
