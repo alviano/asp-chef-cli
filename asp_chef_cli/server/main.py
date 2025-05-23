@@ -7,7 +7,12 @@ from .routers import clingo, dumbo
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5188", "https://asp-chef.alviano.net", "https://aspchef.alviano.net"],
+    allow_origins=[
+        "http://localhost:5188",
+        "https://asp-chef.alviano.net",
+        "https://aspchef.alviano.net",
+        "https://asp-chef.netlify.app",
+    ],
     allow_credentials=False,
     allow_methods=["POST"],
     allow_headers=["*"],
