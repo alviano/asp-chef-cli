@@ -1,4 +1,5 @@
 import json as json_module
+import shutil
 import subprocess
 from collections import defaultdict
 from typing import Optional, Dict, Final
@@ -10,7 +11,7 @@ from ..dependencies import *
 router = APIRouter()
 
 clingo_process: Final[Dict[str, Optional[subprocess.Popen]]] = defaultdict(lambda: None)
-clingo_path: Final = subprocess.run(["which", "clingo"], capture_output=True).stdout.decode().strip()
+clingo_path: Final[str | None] = shutil.which("clingo")
 
 
 def clingo_terminate(uuid):
