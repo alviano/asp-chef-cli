@@ -1,10 +1,13 @@
+import json as json_module
+import shutil
 import subprocess
-
+from collections import defaultdict
 from dumbo_asp.primitives.models import Model
 from dumbo_asp.primitives.rules import SymbolicRule
 from dumbo_asp.primitives.templates import Template
 from dumbo_asp.queries import explanation_graph, pack_xasp_navigator_url
 from fastapi import APIRouter
+from typing import Optional, Dict, Final
 
 from ..dependencies import *
 
@@ -121,6 +124,53 @@ async def _(json):
     return {
         "program": result,
     }
+
+
+pyqasp_process: Final[Dict[str, Optional[subprocess.Popen]]] = defaultdict(lambda: None)
+pyqasp_path: Final[str | None] = shutil.which("pyqasp")
+
+
+def pyqasp_terminate(uuid):
+    if pyqasp_process[uuid] is not None:
+        pyqasp_process[uuid].kill()
+
+
+@endpoint(router, "/pyqasp/")
+async def _(json):
+    global pyqasp_process
+
+    uuid = json["uuid"]
+    program = json["program"]
+    enumerate = json["enumerate"]
+    timeout = json["timeout"]
+    if type(timeout) is not int or timeout < 1 or timeout >= 24 * 60 * 60:
+        timeout = 5
+
+    pyqasp_terminate(uuid)
+
+    # cmd = f"bwrap --ro-bind /usr/lib /usr/lib --ro-bind /lib /lib --ro-bind /lib64 /lib64 " \
+    #       f"--ro-bind /bin/timeout /bin/timeout".split(' ') +\
+    #       ["--ro-bind", pyqasp_path, "/bin/pyqasp"] +\
+    #       ["--bind", "/", "/"] +\
+    #       ["/bin/timeout", str(timeout), "/bin/pyqasp", "/dev/stdin", *options]
+    cmd = ["/bin/timeout", str(timeout), pyqasp_path, "/dev/stdin"]
+    if enumerate:
+        cmd.append("--enumerate")
+    pyqasp_process[uuid] = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = pyqasp_process[uuid].communicate(program.encode())
+    pyqasp_process[uuid] = None
+
+    # report errors
+    lines = out.decode().split('\n')
+    if lines[1].startswith("Error"):
+        raise ValueError('\n'.join(lines[1:]))
+
+    # return models
+    models = lines[3:]
+    models = [
+        [lit for lit in model.split('. ') if not lit.startswith('not ')]
+        for model in models if model and model != "UNSATISFIABLE" and not model.startswith('PyQasp::')]
+    return {"models": models}
 
 
 @endpoint(router, "/template/core-template/")
