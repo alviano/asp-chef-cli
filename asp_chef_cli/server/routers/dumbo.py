@@ -161,15 +161,16 @@ async def _(json):
     pyqasp_process[uuid] = None
 
     # report errors
-    lines = out.decode().split('\n')
-    if lines[1].startswith("Error"):
-        raise ValueError('\n'.join(lines[1:]))
+    output = out.decode()
+    lines = output.split('\n')
+    if any(line.startswith("Error") for line in lines):
+        raise ValueError(output)
 
     # return models
-    models = lines[3:]
     models = [
-        [lit for lit in model.split('. ') if not lit.startswith('not ')]
-        for model in models if model and model != "UNSATISFIABLE" and not model.startswith('PyQasp::')]
+        [lit for lit in json_module.loads(line)['literals'] if not lit.startswith('not ')]
+        for line in lines if line
+    ]
     return {"models": models}
 
 
