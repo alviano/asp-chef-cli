@@ -8,3 +8,5 @@ services:
     volumes:
       - $HOME/.Xauthority:/root/.Xauthority:rw
     network_mode: host
+    ports:
+      - 8000:8000

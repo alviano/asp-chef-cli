@@ -166,6 +166,7 @@ def command_run_with(
 
 @app.command(name="server")
 def command_server(
+        host: str = typer.Option("127.0.0.1", "--host", help="Bind socket to this host"),
         port: int = typer.Option(8000, "--port", "-p",
                                  help="An available port to listen for incoming requests"),
         reload: bool = typer.Option(False, "--reload",
@@ -174,4 +175,4 @@ def command_server(
     """
     Run a server for @dumbo/* operations.
     """
-    uvicorn.run("asp_chef_cli.server.main:app", port=port, reload=reload)
+    uvicorn.run("asp_chef_cli.server.main:app", host=host, port=port, reload=reload)
