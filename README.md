@@ -14,8 +14,8 @@ $ playwright install
 Docker is another option (headed mode needs extra parameters):
 
 ```bash
-$ docker run malvi/asp-chef-cli
-$ docker run --net=host --env="DISPLAY" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" malvi/asp-chef-cli
+$ sudo docker run malvi/asp-chef-cli
+$ sudo docker run --net=host --env="DISPLAY" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" malvi/asp-chef-cli
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ Run with one of the following commands:
 
 ```bash
 $ python -m asp_chef_cli --help
-$ docker run malvi/asp-chef-cli --help
+$ sudo docker run malvi/asp-chef-cli --help
 ```
 
 Add the recipe (an ASP Chef sharable URL) with the option `--url` (quote the URL as it contains characters like # that breaks bash and other terminals).
@@ -67,3 +67,7 @@ By default, it uses port `8000` (a different port can be specified using `--port
 
 For development, add the `--reload` flag so that the server is updated when the Python code of the CLI is changed. 
 
+The Docker version must specify port mapping, for example:
+```bash
+$ sudo docker run -p 8000:8000 malvi/asp-chef-cli server --host 0.0.0.0
+```
