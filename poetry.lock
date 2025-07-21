@@ -480,14 +480,14 @@ wmi = ["wmi (>=1.5.1)"]
 
 [[package]]
 name = "dumbo-asp"
-version = "0.3.15"
+version = "0.3.16"
 description = "Utilities for Answer Set Programming"
 optional = false
 python-versions = "<4.0,>=3.11"
 groups = ["main"]
 files = [
-    {file = "dumbo_asp-0.3.15-py3-none-any.whl", hash = "sha256:688c2fbc45749ae805f7aefacc7272e16201f367caeea6942204f91efec262e9"},
-    {file = "dumbo_asp-0.3.15.tar.gz", hash = "sha256:48ec7cdb4936c839fee906f6b11b4331c4ae6fb7e18daa8ef363868709de3eb2"},
+    {file = "dumbo_asp-0.3.16-py3-none-any.whl", hash = "sha256:4f572a8c188a7a752d0190b0fda8f1d1c09d2573a8ac74c0e0367dff3a44a9b7"},
+    {file = "dumbo_asp-0.3.16.tar.gz", hash = "sha256:e083660bd6e807a1ecf3743a814fb4771f4893ec5e43745fac4678df59c73dc3"},
 ]
 
 [package.dependencies]
@@ -2016,4 +2016,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "dd8e430ba9f42125ce355e80a33fa07d9ce25a7b2001cde8a8983097398d6239"
+content-hash = "507c580f52e927648776cf5b8562af79ac22124d27ad1db9bbe9fadbc0b27eb1"
