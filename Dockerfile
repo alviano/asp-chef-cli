@@ -11,7 +11,7 @@ RUN wget https://github.com/dodaro/SDL/archive/refs/heads/main.zip && mv main.zi
     bash clean-install.bash pyqasp
 
 
-FROM mcr.microsoft.com/playwright/python:v1.50.0-noble
+FROM mcr.microsoft.com/playwright/python:v1.55.0-noble
 
 COPY --from=builder /tmp/sdl.zip /tmp/sdl.zip
 COPY --from=builder /tmp/PyQASP-main/dist/pyqasp /bin/pyqasp

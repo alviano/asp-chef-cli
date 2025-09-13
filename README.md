@@ -14,8 +14,8 @@ $ playwright install
 Docker is another option (headed mode needs extra parameters):
 
 ```bash
-$ sudo docker run malvi/asp-chef-cli
-$ sudo docker run --net=host --env="DISPLAY" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" malvi/asp-chef-cli
+$ sudo docker run -i malvi/asp-chef-cli
+$ sudo docker run -i --net=host --env="DISPLAY" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" malvi/asp-chef-cli
 ```
 
 ## Usage
