@@ -2,7 +2,7 @@ from fastapi import Depends
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import clingo, dumbo
+from .routers import clingo, dumbo, opa
 
 app = FastAPI()
 app.add_middleware(
@@ -19,3 +19,4 @@ app.add_middleware(
 )
 app.include_router(dumbo.router, prefix="/dumbo", tags=["dumbo"])
 app.include_router(clingo.router, prefix="/clingo", tags=["clingo"])
+app.include_router(opa.router, prefix="/opa", tags=["opa"])
