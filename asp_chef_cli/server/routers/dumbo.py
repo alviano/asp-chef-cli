@@ -195,3 +195,24 @@ async def _(json):
     return {
         "program": str(result),
     }
+
+
+@endpoint(router, "/template/parse-custom-template/")
+async def _(json):
+    source = json.get("program", "")
+    if not source.strip():
+        return {"error": "missing program source"}
+
+    program = SymbolicProgram.parse(source)
+    _, templates = Template.expand_program(program, return_templates=True)
+
+    res = {}
+    for key in templates.keys():
+        res[key] = ({
+            "name": str(templates[key].name),
+            "documentation": str(templates[key].documentation),
+            "predicates": sorted([f"{p.name}/{p.arity}" for p in templates[key].predicates()]),
+            "program": str(templates[key].program)
+        })
+
+    return res
