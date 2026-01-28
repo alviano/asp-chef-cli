@@ -101,7 +101,11 @@ def process_url(recipe_url: str, the_input: Optional[str] = None) -> str:
         if not app_options.headless:
             recipe_url = recipe_url.replace("/#", "/open#", 1)
         recipe_url = recipe_url.replace(r"#.*;", "#", 1)
-        recipe_url = recipe_url.replace("#", "#" + compress_object_for_url({"input": the_input}, suffix="") + ";", 1)
+        obj = compress_object_for_url({"input": the_input}, suffix="")
+        if '#' in recipe_url:
+            recipe_url = recipe_url.replace("#", "#" + obj + ";", 1)
+        else:
+            recipe_url += "#" + obj + ";"
 
     return recipe_url
 
