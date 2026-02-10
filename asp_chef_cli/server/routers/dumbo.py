@@ -158,6 +158,7 @@ async def _(json):
         cmd.append("--enumerate")
     pyqasp_process[uuid] = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = pyqasp_process[uuid].communicate(program.encode())
+    timeout_reached: Final = pyqasp_process[uuid].returncode == 124
     pyqasp_process[uuid] = None
 
     # report errors
@@ -165,6 +166,8 @@ async def _(json):
     lines = output.split('\n')
     if any(line.startswith("Error") for line in lines):
         raise ValueError(output)
+    if timeout_reached:
+        lines = [line for line in lines if not line.startswith("Sig term")]
 
     # return models
     models = [
