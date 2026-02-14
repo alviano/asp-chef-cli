@@ -177,6 +177,52 @@ async def _(json):
     return {"models": models}
 
 
+casper_process: Final[Dict[str, Optional[subprocess.Popen]]] = defaultdict(lambda: None)
+casper_path: Final[str | None] = shutil.which("casper")
+
+
+def casper_terminate(uuid):
+    if casper_process[uuid] is not None:
+        casper_process[uuid].kill()
+
+
+@endpoint(router, "/casper/")
+async def _(json):
+    global casper_process
+
+    uuid = json["uuid"]
+    program = json["program"]
+    enumerate = json["enumerate"]
+    timeout = json["timeout"]
+    if type(timeout) is not int or timeout < 1 or timeout >= 24 * 60 * 60:
+        timeout = 5
+
+    casper_terminate(uuid)
+
+    cmd = ["/bin/timeout", str(timeout), casper_path, "--problem", "/dev/stdin", "--json"]
+    if enumerate:
+        cmd.append("-n0")
+    casper_process[uuid] = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = casper_process[uuid].communicate(program.encode())
+    timeout_reached: Final = pyqasp_process[uuid].returncode == 124
+    casper_process[uuid] = None
+    
+    # report errors
+    output = out.decode()
+    lines = output.split('\n')
+    if any(line.startswith("Error") for line in lines):
+        raise ValueError(output)
+    if timeout_reached:
+        lines = [line for line in lines if not line.startswith("Sig term")]
+
+    # return models
+    models = [
+        [lit for lit in json_module.loads(line)['literals'] if not lit.startswith('not ')]
+        for line in lines if line
+    ]
+    return {"models": models}    
+
+
 @endpoint(router, "/template/core-template/")
 async def _(json):
     if not json:
