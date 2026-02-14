@@ -204,7 +204,7 @@ async def _(json):
         cmd.append("-n0")
     casper_process[uuid] = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = casper_process[uuid].communicate(program.encode())
-    timeout_reached: Final = pyqasp_process[uuid].returncode == 124
+    timeout_reached: Final = casper_process[uuid].returncode == 124
     casper_process[uuid] = None
     
     # report errors
