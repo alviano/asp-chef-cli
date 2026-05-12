@@ -1,5 +1,6 @@
 import dataclasses
 import fileinput
+import os
 from enum import Enum
 from typing import Optional
 
@@ -174,9 +175,12 @@ def command_server(
         port: int = typer.Option(8000, "--port", "-p",
                                  help="An available port to listen for incoming requests"),
         reload: bool = typer.Option(False, "--reload",
-                                    help="Reload server if source code changes (for development)")
+                                    help="Reload server if source code changes (for development)"),
+        ollama_port: int = typer.Option(11434, "--ollama-port",
+                                        help="Port where Ollama is listening (for Ollama integration)"),
 ) -> None:
     """
     Run a server for @dumbo/* operations.
     """
+    os.environ["ASP_CHEF_CLI__OLLAMA_URL"] = f"http://127.0.0.1:{ollama_port}"
     uvicorn.run("asp_chef_cli.server.main:app", host=host, port=port, reload=reload)
