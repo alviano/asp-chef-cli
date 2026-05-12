@@ -1,15 +1,17 @@
-import httpx
 import json as json_module
 import os
 import shutil
 import subprocess
 from collections import defaultdict
+from typing import Optional, Dict, Final
+
+import httpx
 from dumbo_asp.primitives.models import Model
 from dumbo_asp.primitives.rules import SymbolicRule
 from dumbo_asp.primitives.templates import Template
 from dumbo_asp.queries import explanation_graph, pack_xasp_navigator_url
-from fastapi import APIRouter, Request, Response
-from typing import Optional, Dict, Final
+from fastapi import APIRouter, Response
+from fastapi.responses import StreamingResponse
 
 from ..dependencies import *
 
@@ -274,33 +276,31 @@ OLLAMA_URL = os.getenv("ASP_CHEF_CLI__OLLAMA_URL", "http://127.0.0.1:11434")
 
 @router.api_route("/ollama/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 async def ollama_proxy(path: str, request: Request):
+    url = f"{OLLAMA_URL}/{path.lstrip('/')}"
+    method = request.method
+    params = request.query_params
 
-    async with httpx.AsyncClient() as client:
-        # 1. Prepare the forwarded request
-        url = f"{OLLAMA_URL}/{path}"
+    body = await request.body()
+    headers = dict(request.headers)
+    headers.pop("host", None)
+    headers.pop("content-length", None)  # Let httpx recalculate it
 
-        # 2. Get body and headers (excluding Host)
-        body = await request.body()
-        headers = dict(request.headers)
-        headers.pop("host", None)
+    async def generate_stream():
+        async with httpx.AsyncClient(timeout=None) as client:
+            async with client.stream(
+                    method=method,
+                    url=url,
+                    params=params,
+                    headers=headers,
+                    content=body,
+            ) as rp_resp:
+                async for chunk in rp_resp.aiter_bytes():
+                    yield chunk
 
-        # 3. Forward the request to Ollama
-        try:
-            rp_resp = await client.request(
-                method=request.method,
-                url=url,
-                params=request.query_params,
-                headers=headers,
-                content=body,
-                timeout=None  # Important for long LLM generations
-            )
-        except httpx.ConnectError:
-            return Response(content="Ollama not running", status_code=503)
-
-        # 4. Return the response with proper headers
-        # Your FastAPI CORS middleware will handle the "Access-Control" headers automatically
-        return Response(
-            content=rp_resp.content,
-            status_code=rp_resp.status_code,
-            headers=dict(rp_resp.headers)
+    try:
+        return StreamingResponse(
+            generate_stream(),
+            media_type="application/octet-stream"
         )
+    except httpx.ConnectError:
+        return Response(content="Ollama not running", status_code=503)
