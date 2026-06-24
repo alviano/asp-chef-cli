@@ -120,8 +120,9 @@ async def _(json):
 @endpoint(router, "/sdl/")
 async def _(json):
     program = json["program"]
+    minizinc = json["minizinc"]
     result = subprocess.check_output(
-        ["./run.sh"],
+        ["./run.sh", "minizinc" if minizinc else "asp"],
         input=program.encode(),
         cwd="../SDL",
     )
