@@ -1,7 +1,9 @@
 import json as json_module
 import os
+import re
 import shutil
 import subprocess
+import tempfile
 from collections import defaultdict
 from typing import Optional, Dict, Final
 
@@ -16,6 +18,12 @@ from fastapi.responses import StreamingResponse
 from ..dependencies import *
 
 router = APIRouter()
+
+
+def strip_ansi_codes(text):
+    # This regex matches standard ANSI escape sequences
+    ansi_regex = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]')
+    return ansi_regex.sub('', text)
 
 
 @endpoint(router, "/to-zero-simplification-version/")
@@ -257,24 +265,30 @@ async def _(json):
 
     pasta_terminate(uuid)
 
-    cmd = ["/bin/timeout", str(timeout), pasta_path, "/tmp/a"]
-    pasta_process[uuid] = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = pasta_process[uuid].communicate(program.encode())
+    with tempfile.NamedTemporaryFile(mode='w', delete=True) as temp_file:
+        temp_file.write(program)
+        temp_file.flush()
+
+        cmd = ["/bin/timeout", str(timeout), pasta_path, temp_file.name]
+        pasta_process[uuid] = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = pasta_process[uuid].communicate()
+
     timeout_reached: Final = pasta_process[uuid].returncode == 124
     pasta_process[uuid] = None
 
     # report errors
     output = out.decode()
     lines = output.split('\n')
+    lines = [strip_ansi_codes(line) for line in lines]
     if any(line.startswith("Error") for line in lines):
-        raise ValueError(output)
+        raise ValueError('\n' + '\n'.join(lines))
     if timeout_reached:
         lines = [line for line in lines if not line.startswith("Sig term")]
 
     lines = [line for line in lines if line]
     lb, ub = None, None
     if len(lines) == 1:
-        lb = ub = lines[0].split("Lower probability == upper probability for the query: ")[1]
+        lb = ub = float(lines[0].split("Lower probability == upper probability for the query: ")[1])
     elif len(lines) == 2:
         lb = float(lines[0].split("Lower probability for the query: ")[1])
         ub = float(lines[1].split("Upper probability for the query: ")[1])
