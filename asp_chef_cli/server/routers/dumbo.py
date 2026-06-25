@@ -228,6 +228,72 @@ async def _(json):
     return {"models": models}    
 
 
+pasta_process: Final[Dict[str, Optional[subprocess.Popen]]] = defaultdict(lambda: None)
+pasta_path: Final[str | None] = shutil.which("pastasolver")
+
+
+def pasta_terminate(uuid):
+    if pasta_process[uuid] is not None:
+        pasta_process[uuid].kill()
+
+
+@endpoint(router, "/pasta/")
+async def _(json):
+    global pasta_process
+
+    uuid = json["uuid"]
+    program = json["program"]
+    output_predicate = json["output_predicate"] or "__bounds__"
+    bound_multiplier = 0
+    try:
+        bound_multiplier = int(json["bound_multiplier"])
+        bound_multiplier = min(max(bound_multiplier, 0), 1_000_000)
+    except ValueError:
+        bound_multiplier = 0
+
+    timeout = json["timeout"]
+    if type(timeout) is not int or timeout < 1 or timeout >= 24 * 60 * 60:
+        timeout = 5
+
+    pasta_terminate(uuid)
+
+    cmd = ["/bin/timeout", str(timeout), pasta_path, "/tmp/a"]
+    pasta_process[uuid] = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = pasta_process[uuid].communicate(program.encode())
+    timeout_reached: Final = pasta_process[uuid].returncode == 124
+    pasta_process[uuid] = None
+
+    # report errors
+    output = out.decode()
+    lines = output.split('\n')
+    if any(line.startswith("Error") for line in lines):
+        raise ValueError(output)
+    if timeout_reached:
+        lines = [line for line in lines if not line.startswith("Sig term")]
+
+    lines = [line for line in lines if line]
+    lb, ub = None, None
+    if len(lines) == 1:
+        lb = ub = lines[0].split("Lower probability == upper probability for the query: ")[1]
+    elif len(lines) == 2:
+        lb = float(lines[0].split("Lower probability for the query: ")[1])
+        ub = float(lines[1].split("Upper probability for the query: ")[1])
+
+    if lb is None or ub is None:
+        raise ValueError("Could not parse output from PASTA solver:\n" + '\n'.join(lines))
+
+    if bound_multiplier:
+        lb = round(lb * bound_multiplier)
+        ub = round(ub * bound_multiplier)
+    else:
+        lb = f'real("{lb}")'
+        ub = f'real("{ub}")'
+
+    return {"models": [
+        [f'{output_predicate}({lb},{ub})']
+    ]}
+
+
 @endpoint(router, "/template/core-template/")
 async def _(json):
     if not json:
